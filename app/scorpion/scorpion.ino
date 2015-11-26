@@ -3,13 +3,14 @@
 // #################### CONSTANTS ####################
 const int power_trigger = 2;
 const int power_position = 6;
+const int power_selector = 3;
+const int io_selector = A2;
 const int io_trigger = A1;
 const int io_position = A7;
 const int motor = A3;
 
 // #################### RUNTIMES ####################
-float position;
-float trigger;
+
 
 boolean rearposition = false;
 boolean frontposition = false;
@@ -22,19 +23,28 @@ void setup() {
   // Start serial monitor
   if(debug)Serial.begin(19200);
   
-  // What's this for? Are you starting the motor now?
-  // This seems like it might make the gun fire when you boot...
-  analogWrite(motor,HIGH);
+  // Initializes motor. Doesn't cause it to start firing.
+    analogWrite(motor,HIGH);
 
   // Initialize IO pins
+  pinMode(power_selector,OUTPUT);
   pinMode(power_trigger,OUTPUT);
   pinMode(power_position, OUTPUT);
   pinMode(io_position,INPUT);
   pinMode(io_trigger,INPUT);
+  pinMode(io_selector,INPUT);
 
-  // Why are you setting these high in setup? Necessary?
+  // Turns on the hall sensors. Later we can set it so only the trigger is on in idle 
+  //and the other hall sensors come on when the trigger is pulled to save battery
   digitalWrite(power_position,HIGH);
   digitalWrite(power_trigger,HIGH);
+  digitalWrite(power_selector,HIGH);
+}
+// #################### Selector ####################
+float selector(){
+  return analogRead(io_selector) *(1.00/1023.00);
+  //semi reads between 0.27 and 0.28
+  // auto reads 0.36 
 }
 // #################### TRIGGER ####################
 boolean trigger(){
@@ -47,7 +57,7 @@ float position(){
 }
 // #################### LOOP ####################
 void loop() {
-
+ 
   // Is trigger pulled on a new cycle?
   if(!cyclecomplete && trigger())
   {
@@ -57,7 +67,7 @@ void loop() {
     // Check if tappet has reached rear position
     if (position() <= .48)
     {
-      Serial.println("rear position");
+      if(debug) Serial.println("rear position");
       rearposition = true;
     }
     
@@ -67,17 +77,17 @@ void loop() {
     // rearposition is false we don't bother to do the 
     // analog read. Burns less battery, uses less resources, 
     // doesn't slow down execution speed. 
-    if (rearposition && position() >= .50)
+    if (rearposition && position() >= .49)
     {
       frontposition = true;
-      Serial.println("front position");
+      if(debug) Serial.println("front position");
     }
 
     // If tappet has fully cycled, shut off motor.
     if (frontposition && rearposition)
     {
       digitalWrite(motor,LOW);
-      Serial.println("no more pew pew");
+      if(debug) Serial.println("no more pew pew");
       rearposition = false;
       frontposition = false;
       cyclecomplete = true;
@@ -85,8 +95,11 @@ void loop() {
     
   } else if(cyclecomplete && trigger()) {
     // Do nothing, semi auto fired but trigger still pulled
+    digitalWrite(motor,LOW);
+    //added this cause it would sometimes burst
   } else {
-    // Trigger not pulled, reset cycle
+    digitalWrite(motor,LOW);// Trigger not pulled, reset cycle
+    //same thing here as the line above
     cyclecomplete = false;
   }
 }
