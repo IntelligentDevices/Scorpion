@@ -25,7 +25,7 @@ Magnets need to be glued to various parts to interact with the hall sensors.
 Position the magnet in the center of the bottom of the tappet plate, on its side, so that in the forward position the magnet is directly over the hall sensor, as shown above.
 
 ####Trigger
-The ear hanging off the top of the trigger should be trimmed with a dremel, to allow clearance over the wiring. The magnet should be secured at the back edge of the trigger on the cut area, as shown above.
+The ear hanging off the top of the trigger that interacts with the cut-off lever should be trimmed with a dremel, to allow clearance over the wiring. The magnet should be secured at the back edge of the trigger on the cut area, as shown above.
 
 ####Selector Plate
 The copper slip on the bottom of the selector plate should be removed, and the magnet glued to the bottom-front corner, with clearance for the tab that slides into the gearbox, as shown above.
