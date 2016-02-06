@@ -76,13 +76,9 @@ boolean trigger(){
 }
 // #################### SENSOR POSITION ####################
 float position(){
-<<<<<<< HEAD
-  return analogRead(io_position) *(1.00/1023.00);
-=======
   float p = (analogRead(io_position) *(1.00/1023.00))+tappet_offset;
   if(debug)Serial.println(p);
   return p;
->>>>>>> accac6479c45200aaf2772a400af8d3cb9bc0ea5
 }
 // #################### WATCH FIRE CYCLE ####################
 void watchcycle(){
@@ -96,11 +92,7 @@ void watchcycle(){
     // and THEN check if it has hit front position
     if (rearposition && position() <= .46)
     {
-<<<<<<< HEAD
-      //Serial.println("Cycle: Front Position");
-=======
       if(debug)Serial.println("Cycle: Front Position");
->>>>>>> accac6479c45200aaf2772a400af8d3cb9bc0ea5
       frontposition = true;
     }
 
