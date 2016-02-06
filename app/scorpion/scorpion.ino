@@ -70,22 +70,21 @@ boolean trigger(){
 }
 // #################### SENSOR POSITION ####################
 float position(){
-  Serial.println(analogRead(io_position));
   return analogRead(io_position) *(1.00/1023.00);
 }
 // #################### WATCH FIRE CYCLE ####################
 void watchcycle(){
-    //Serial.println(position());
     // Check if tappet has reached rear position
-    if (position() <= .48)
+    if (position() >= .49)
     {
+      //Serial.println("Cycle: Rear Position");
       rearposition = true;
     }
     // Check if tappet has already reached rear position 
     // and THEN check if it has hit front position
-    if (rearposition && position() >= .49)
+    if (rearposition && position() <= .46)
     {
-      Serial.println("Cycle: Front Position");
+      //Serial.println("Cycle: Front Position");
       frontposition = true;
     }
 
@@ -111,11 +110,12 @@ void loop() {
     int rounds = (isauto()?autorounds:semirounds);
     // listen for cycle count
     watchcycle();
-    
+
     // Check if enough rounds have been fired
     if(cyclecount>=rounds){
       // cycles meets or exceeds round count for selector position
       // motor off
+      Serial.println("Motor Off");
       digitalWrite(motor,LOW);
     }else{
       // cycles has not yet hit desired count
