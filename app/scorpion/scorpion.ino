@@ -1,5 +1,4 @@
 #include <SoftwareSerial.h>
-
 // #################### BEGIN USER SETTINGS ####################
 // For full-auto, use a large number like 9999. Since no magazine 
 // has that many rounds in it, it will fire effectively fire until 
@@ -8,6 +7,15 @@
 const int semirounds = 1;
 // THE NUMBER OF ROUNDS TO FIRE IN FULL-AUTO MODE 
 const int autorounds = 3;
+// DEBUG MODE SHOULD BE TURNED OFF WHEN NOT ATTACHED TO THE IDE
+const boolean debug = true;
+// USE THE FOLLOWING OFFSETS TO ADJUST THE SENSOR READINGS TO
+// COMPENSATE FOR INSTALL TOLERANCES
+// Use small increments to increase or decrease the offset, 
+// e.g. 0.1 or -0.1
+const float trigger_offset = 0.0;
+const float tappet_offset = 0.0;
+const float selector_offset = 0.0;
 // #################### END USER SETTINGS ####################
 
 
@@ -25,7 +33,6 @@ boolean rearposition = false;
 boolean frontposition = false;
 boolean cyclecomplete = false;
 int cyclecount = 0;
-const boolean debug = true;
 // #################### SETUP ####################
 void setup() {
   // Start serial monitor
@@ -44,13 +51,12 @@ void setup() {
 
   // Turn on trigger sensor
   digitalWrite(power_trigger,HIGH);
-
+  digitalWrite(power_position,HIGH);
+  digitalWrite(power_selector,HIGH);
   // Initialize selector and tappet sensors as OFF
   //digitalWrite(power_position,LOW);
   //digitalWrite(power_selector,LOW);
-  Serial.println("Initializing");
-  digitalWrite(power_position,HIGH);
-  digitalWrite(power_selector,HIGH);
+  if(debug)Serial.println("Initializing");
 
 }
 // #################### SELECTOR MODE ####################
@@ -59,18 +65,24 @@ boolean isauto(){
   // auto reads 0.47 
   // adjust the >0.40 below to set the breakpoint 
   // where it should mean full auto
-//  Serial.println(analogRead(io_selector) *(1.00/1023.00));
-  return ((analogRead(io_selector) *(1.00/1023.00))>0.40);
+  float a = ((analogRead(io_selector) *(1.00/1023.00))>0.40)+selector_offset;
+  return a;
 }
 // #################### TRIGGER PULL ####################
 boolean trigger(){
-  float t = analogRead(io_trigger) *(1.00/1023.00);
+  float t = (analogRead(io_trigger) *(1.00/1023.00))+trigger_offset;
   // 0.35 and below means trigger is pulled
   return (t<= 0.35);
 }
 // #################### SENSOR POSITION ####################
 float position(){
+<<<<<<< HEAD
   return analogRead(io_position) *(1.00/1023.00);
+=======
+  float p = (analogRead(io_position) *(1.00/1023.00))+tappet_offset;
+  if(debug)Serial.println(p);
+  return p;
+>>>>>>> accac6479c45200aaf2772a400af8d3cb9bc0ea5
 }
 // #################### WATCH FIRE CYCLE ####################
 void watchcycle(){
@@ -84,14 +96,18 @@ void watchcycle(){
     // and THEN check if it has hit front position
     if (rearposition && position() <= .46)
     {
+<<<<<<< HEAD
       //Serial.println("Cycle: Front Position");
+=======
+      if(debug)Serial.println("Cycle: Front Position");
+>>>>>>> accac6479c45200aaf2772a400af8d3cb9bc0ea5
       frontposition = true;
     }
 
     // tappet has fully cycled, increment cycle
     if (frontposition && rearposition)
     {
-      Serial.println("Cycle Complete");
+      if(debug)Serial.println("Cycle Complete");
       rearposition = false;
       frontposition = false;
       cyclecount = cyclecount + 1;
